@@ -575,7 +575,47 @@ function navRow(opts){
   <div class="nav-row">
     <button class="nav ghost" id="backBtn" ${backDisabled ? 'disabled' : ''}>Back</button>
     <button class="nav primary" id="nextBtn" ${nextDisabled ? 'disabled' : ''}>${nextLabel || 'Next'}</button>
-  </div>`;
+  </div>
+  <p class="small-note" id="requiredNote" style="${nextDisabled ? '' : 'display:none;'}">Fill in everything above to continue.</p>`;
+}
+
+function isStepComplete(step){
+  if (step.type === 'intro') return true;
+  if (step.type === 'setup'){
+    const name = (document.getElementById('f-name')?.value || '').trim();
+    const desc = (document.getElementById('f-desc')?.value || '').trim();
+    const label = (document.getElementById('f-label')?.value || '').trim();
+    return !!(name && desc && label);
+  }
+  if (step.type === 'textarea'){
+    return !!(document.getElementById('f-main')?.value || '').trim();
+  }
+  if (step.type === 'list'){
+    const inputs = document.querySelectorAll('.list-input');
+    const hasItem = Array.from(inputs).some(i => i.value.trim());
+    if (!hasItem) return false;
+    if (step.topLabel){
+      return !!(document.getElementById('f-top')?.value || '').trim();
+    }
+    return true;
+  }
+  if (step.type === 'perspective'){
+    const a = (document.getElementById('f-persp-a')?.value || '').trim();
+    const b = (document.getElementById('f-persp-b')?.value || '').trim();
+    return !!(a && b);
+  }
+  if (step.type === 'confidence'){
+    return !!(document.getElementById('f-understanding')?.value || '').trim();
+  }
+  return true;
+}
+
+function refreshNextButton(step){
+  const btn = document.getElementById('nextBtn');
+  const note = document.getElementById('requiredNote');
+  const complete = isStepComplete(step);
+  if (btn) btn.disabled = !complete;
+  if (note) note.style.display = complete ? 'none' : '';
 }
 
 function render(){
@@ -676,7 +716,7 @@ function render(){
     const navHTML = navRow({
       backDisabled: state.step === 0,
       nextLabel: step.type === 'intro' ? 'Begin' : (state.step === STEPS.length - 2 ? 'See possibilities' : 'Next'),
-      nextDisabled: false
+      nextDisabled: !isStepComplete(step)
     });
     app.appendChild(el(`<div>${navHTML}${progressTrack()}</div>`));
   } else {
@@ -843,6 +883,21 @@ function attachHandlers(step){
     render();
   });
 
+  // Live-validate required fields so the Next button enables as soon as
+  // everything on this step is filled in.
+  if (step.type !== 'results' && step.type !== 'intro'){
+    const watchIds = ['f-name','f-desc','f-label','f-main','f-persp-a','f-persp-b','f-understanding','f-top'];
+    watchIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', () => refreshNextButton(step));
+    });
+    if (step.type !== 'list'){
+      document.querySelectorAll('.list-input').forEach(input => {
+        input.addEventListener('input', () => refreshNextButton(step));
+      });
+    }
+  }
+
   if (step.type === 'list'){
     document.getElementById('addItemBtn').addEventListener('click', () => {
       saveCurrentStepInputs();
@@ -869,9 +924,14 @@ function attachHandlers(step){
         topSelect.innerHTML = '<option value="">Choose one...</option>' +
           nonEmpty.map(v => `<option value="${escapeAttr(v)}" ${v === current ? 'selected' : ''}>${escapeHTML(v)}</option>`).join('');
         if (!nonEmpty.includes(current)) topSelect.value = '';
+        refreshNextButton(step);
       };
       document.querySelectorAll('.list-input').forEach(input => {
         input.addEventListener('input', refreshTopOptions);
+      });
+    } else {
+      document.querySelectorAll('.list-input').forEach(input => {
+        input.addEventListener('input', () => refreshNextButton(step));
       });
     }
   }
@@ -1071,3 +1131,4 @@ loadSession();
 </script>
 </body>
 </html>
+
