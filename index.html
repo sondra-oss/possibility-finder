@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Possibility Finder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #ECE7DC;
+    --surface: #FAF7F1;
+    --ink: #2B2A28;
+    --muted: #8C8579;
+    --line: rgba(43,42,40,0.12);
+    --you: #BD5D3A;
+    --you-soft: rgba(189,93,58,0.14);
+    --them: #4A7C82;
+    --them-soft: rgba(74,124,130,0.14);
+    --overlap: #C99A3E;
+    --radius: 14px;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Work Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .shell{
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem 4rem;
+  }
+
+  header.top{
+    margin-bottom: 1.75rem;
+  }
+
+  h1.title{
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 2rem;
+    letter-spacing: -0.01em;
+    margin: 0 0 0.35rem;
+  }
+
+  p.subtitle{
+    color: var(--muted);
+    font-size: 0.98rem;
+    line-height: 1.55;
+    margin: 0;
+    max-width: 32rem;
+  }
+
+  .visual-wrap{
+    margin: 1.75rem 0;
+  }
+
+  svg.circles{
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .circle-label{
+    font-family: 'Work Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .overlap-label{
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 13px;
+    fill: #FFFFFF;
+  }
+
+  .step-counter{
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 0.4rem;
+  }
+
+  .card{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1.75rem;
+  }
+
+  .eyebrow{
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin: 0 0 0.5rem;
+  }
+
+  .eyebrow.you{ color: var(--you); }
+  .eyebrow.them{ color: var(--them); }
+  .eyebrow.neutral{ color: var(--muted); }
+
+  h2.prompt{
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 1.4rem;
+    line-height: 1.35;
+    margin: 0 0 0.35rem;
+  }
+
+  p.hint{
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.5;
+    margin: 0 0 1.1rem;
+  }
+
+  label.field-label{
+    display:block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin: 1rem 0 0.4rem;
+  }
+  label.field-label:first-of-type{ margin-top: 0; }
+
+  input[type="text"], textarea, select{
+    width: 100%;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 0.98rem;
+    color: var(--ink);
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 0.65rem 0.8rem;
+    resize: vertical;
+    line-height: 1.45;
+  }
+
+  input[type="text"]:focus, textarea:focus, select:focus{
+    outline: 2px solid var(--overlap);
+    outline-offset: 1px;
+  }
+
+  textarea{ min-height: 5.5rem; }
+
+  .list-row{
+    display:flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    align-items: flex-start;
+  }
+  .list-row input{ flex:1; }
+  .remove-btn{
+    flex-shrink:0;
+    width: 2.4rem;
+    height: 2.4rem;
+    border: 1px solid var(--line);
+    background:#fff;
+    border-radius: 10px;
+    color: var(--muted);
+    font-size: 1.1rem;
+    cursor:pointer;
+    line-height:1;
+  }
+  .remove-btn:hover{ color: var(--ink); }
+
+  .add-btn{
+    background: none;
+    border: 1px dashed var(--line);
+    border-radius: 10px;
+    padding: 0.5rem 0.9rem;
+    font-size: 0.88rem;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: 'Work Sans', sans-serif;
+    margin-top: 0.2rem;
+  }
+  .add-btn:hover{ color: var(--ink); border-color: var(--muted); }
+
+  .top-pick{
+    margin-top: 1.1rem;
+    padding-top: 1.1rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .nav-row{
+    display:flex;
+    justify-content: space-between;
+    align-items:center;
+    margin-top: 1.5rem;
+  }
+
+  button.nav{
+    font-family: 'Work Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 0.65rem 1.3rem;
+    border-radius: 10px;
+    cursor: pointer;
+    border: 1px solid var(--line);
+  }
+
+  button.nav.primary{
+    background: var(--ink);
+    color: var(--surface);
+    border-color: var(--ink);
+  }
+  button.nav.primary:hover{ opacity: 0.88; }
+
+  button.nav.ghost{
+    background: none;
+    color: var(--muted);
+  }
+  button.nav.ghost:hover{ color: var(--ink); }
+
+  button.nav:disabled{
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  .progress-track{
+    display:flex;
+    gap: 4px;
+    margin-top: 1.5rem;
+  }
+  .progress-dot{
+    height: 4px;
+    flex:1;
+    border-radius: 2px;
+    background: var(--line);
+  }
+  .progress-dot.done{ background: var(--overlap); }
+  .progress-dot.current{ background: var(--ink); }
+
+  .confidence-row{
+    margin-bottom: 1.2rem;
+  }
+  .confidence-row .label-line{
+    display:flex;
+    justify-content: space-between;
+    font-size: 0.92rem;
+    margin-bottom: 0.35rem;
+  }
+  .confidence-row .label-line span.val{
+    font-weight: 500;
+    color: var(--them);
+    font-variant-numeric: tabular-nums;
+  }
+  input[type="range"]{
+    width: 100%;
+    accent-color: var(--them);
+  }
+
+  .small-note{
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-top: 0.6rem;
+    line-height: 1.5;
+  }
+
+  /* Results */
+  .option-card{
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: #fff;
+    padding: 1.1rem 1.25rem;
+    margin-bottom: 0.9rem;
+  }
+  .option-title{
+    font-family: 'Fraunces', serif;
+    font-size: 1.08rem;
+    font-weight: 500;
+    margin: 0 0 0.2rem;
+  }
+  .option-desc{
+    font-size: 0.92rem;
+    color: var(--muted);
+    margin: 0 0 0.85rem;
+    line-height: 1.5;
+  }
+  .bar-group{
+    display:flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .bar-row{
+    display:grid;
+    grid-template-columns: 70px 1fr;
+    align-items:center;
+    gap: 0.6rem;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+  .bar-track{
+    display:flex;
+    height: 6px;
+    border-radius: 3px;
+    overflow:hidden;
+    background: var(--line);
+  }
+  .bar-fill.you{ background: var(--you); }
+  .bar-fill.them{ background: var(--them); }
+
+  .analysis-block{
+    margin-top: 1.75rem;
+  }
+  .reflection-block{
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .reflection-grid{
+    margin-top: 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .reflection-line{
+    font-size: 0.92rem;
+    line-height: 1.5;
+    margin: 0 0 0.4rem;
+  }
+  .reflection-line strong{
+    font-weight: 500;
+  }
+  .analysis-block h3{
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 1.05rem;
+    margin: 0 0 0.5rem;
+  }
+  .analysis-block ul{
+    margin: 0 0 1.25rem;
+    padding-left: 1.1rem;
+    font-size: 0.92rem;
+    line-height: 1.6;
+  }
+
+  .action-row{
+    display:flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+  }
+
+  .loading{
+    display:flex;
+    align-items:center;
+    gap: 0.6rem;
+    color: var(--muted);
+    font-size: 0.95rem;
+    padding: 1rem 0;
+  }
+  .spinner{
+    width: 16px; height:16px;
+    border: 2px solid var(--line);
+    border-top-color: var(--them);
+    border-radius:50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+
+  .error-box{
+    border: 1px solid var(--you);
+    background: var(--you-soft);
+    border-radius: 10px;
+    padding: 0.9rem 1rem;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+  }
+
+  @media (max-width: 480px){
+    .shell{ padding: 1.5rem 1rem 3rem; }
+    h1.title{ font-size: 1.65rem; }
+    h2.prompt{ font-size: 1.2rem; }
+    .card{ padding: 1.25rem; }
+  }
+</style>
+</head>
+<body>
+<div class="shell" id="app"></div>
+
+<script>
+const STORAGE_KEY = 'possibility-finder-session';
+
+// Fill this in once you've deployed the Vercel backend, e.g.
+// const BACKEND_URL = 'https://your-project-name.vercel.app/api/generate';
+const BACKEND_URL = 'https://possibility-finder.vercel.app/api/generate';
+
+let state = {
+  step: 0,
+  setup: { name: '', label: '', description: '' },
+  gratitude: { items: ['', '', ''] },
+  yourOutcome: '',
+  theirOutcome: '',
+  theirGenerous: '',
+  yourProvides: { items: ['', '', ''], top: '' },
+  theirProvides: { items: ['', '', ''], top: '' },
+  yourFears: { items: ['', '', ''], top: '' },
+  theirFears: { items: ['', '', ''], top: '' },
+  yourIdentity: { items: ['', '', ''], top: '' },
+  theirIdentity: { items: ['', '', ''], top: '' },
+  perspective: { a: '', b: '' },
+  confidence: 5,
+  understandingQuestion: '',
+  results: null,
+  resultsError: null
+};
+
+const STEPS = [
+  { type: 'intro' },
+  { type: 'setup' },
+  {
+    type: 'list', key: 'gratitude', person: 'them',
+    eyebrow: 'A way back to other options',
+    title: 'What do you appreciate about them?',
+    hint: 'When a conflict takes up all the space, it\u2019s easy to lose sight of everything else. Naming what you appreciate about this person is one way to find other options. List three to five things.'
+  },
+  {
+    type: 'textarea', key: 'yourOutcome', person: 'you',
+    eyebrow: 'Your outcome',
+    title: 'If this went exactly your way, what would that look like?',
+    hint: 'Not the diplomatic version. The one you\u2019d actually want. Be as detailed as you can.'
+  },
+  {
+    type: 'textarea', key: 'theirOutcome', person: 'them',
+    eyebrow: 'Their outcome',
+    title: 'Now imagine it went exactly their way. What would that look like?',
+    hint: 'This is a guess. You won\u2019t get it exactly right, and that\u2019s fine. Be as detailed as you can.'
+  },
+  {
+    type: 'textarea', key: 'theirGenerous', person: 'them',
+    eyebrow: 'A more generous read',
+    title: 'What\u2019s the most generous interpretation of what they\u2019re trying to do here?',
+    hint: 'People rarely think of themselves as the villain. If they were the hero of this story, how would they explain it?'
+  },
+  {
+    type: 'list', key: 'yourProvides', person: 'you',
+    eyebrow: 'What it gives you',
+    title: 'If you got everything you wanted, what would that actually give you?',
+    hint: 'Keep going past the initial answers to find the less obvious ones.',
+    topLabel: 'Of everything you listed, which matters most?'
+  },
+  {
+    type: 'list', key: 'theirProvides', person: 'them',
+    eyebrow: 'What it gives them',
+    title: 'If they got everything they wanted, what would that give them \u2014 from their most generous perspective?',
+    hint: 'Same question, their side. Guess freely but be sure it reflects what THEY would say.',
+    topLabel: 'Which of these do you think matters most to them?'
+  },
+  {
+    type: 'list', key: 'yourFears', person: 'you',
+    eyebrow: 'What you\u2019re guarding against',
+    title: 'What are you afraid would happen if you didn\u2019t get what you want?',
+    hint: 'List as many as you can think of. Some will be bigger than others.',
+    topLabel: 'Which of these is most important for you to avoid?'
+  },
+  {
+    type: 'list', key: 'theirFears', person: 'them',
+    eyebrow: 'What they might be guarding against',
+    title: 'What do you think are all the things they\u2019re afraid would happen if they didn\u2019t get what they want?',
+    hint: 'Still a guess. Notice if this is harder to do than the last one.',
+    topLabel: 'Which of these do you think matters most to them?'
+  },
+  {
+    type: 'list', key: 'yourIdentity', person: 'you',
+    eyebrow: 'Who you\u2019re trying to be',
+    title: 'In the story you\u2019re telling yourself about this, who are you trying to be?',
+    hint: 'A fair person. A good parent. Someone who doesn\u2019t get pushed around. The peacemaker. Whatever comes up.',
+    topLabel: 'Which version of yourself feels most important here?'
+  },
+  {
+    type: 'list', key: 'theirIdentity', person: 'them',
+    eyebrow: 'Who they might be trying to be',
+    title: 'If they\u2019re the hero of their own story, who are they trying to be?',
+    hint: 'A reasonable person. Someone who can\u2019t be taken advantage of. A good provider. Take a guess.',
+    topLabel: 'Which version of themselves do you think matters most to them?'
+  },
+  { type: 'perspective' },
+  { type: 'confidence' },
+  { type: 'results' }
+];
+
+function loadSession(){
+  try{
+    if (window.storage){
+      window.storage.get(STORAGE_KEY).then(res => {
+        if (res && res.value){
+          try{
+            const saved = JSON.parse(res.value);
+            state = Object.assign(state, saved);
+          }catch(e){}
+        }
+        render();
+      }).catch(()=> render());
+    } else {
+      render();
+    }
+  }catch(e){ render(); }
+}
+
+function saveSession(){
+  try{
+    if (window.storage){
+      window.storage.set(STORAGE_KEY, JSON.stringify(state)).catch(()=>{});
+    }
+  }catch(e){}
+}
+
+function el(html){
+  const t = document.createElement('template');
+  t.innerHTML = html.trim();
+  return t.content.firstElementChild;
+}
+
+function circlesSVG(progress){
+  const minDist = 64, maxDist = 168;
+  const dist = maxDist - (maxDist - minDist) * progress;
+  const cx1 = 150 - dist/2, cx2 = 150 + dist/2;
+  const r = 62;
+  const overlapVisible = progress > 0.08;
+  return `
+  <svg class="circles" viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="${cx1}" cy="70" r="${r}" fill="${getVar('--you')}" opacity="0.45"/>
+    <circle cx="${cx2}" cy="70" r="${r}" fill="${getVar('--them')}" opacity="0.45"/>
+    <text x="${cx1 - r + 10}" y="142" class="circle-label" fill="${getVar('--you')}">You</text>
+    <text x="${cx2 + r - 38}" y="142" class="circle-label" fill="${getVar('--them')}">Them</text>
+    ${overlapVisible ? `<text x="150" y="74" text-anchor="middle" class="overlap-label">possibility</text>` : ''}
+  </svg>`;
+}
+
+function getVar(name){
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function progressFraction(){
+  return state.step / (STEPS.length - 1);
+}
+
+function header(){
+  return `
+  <header class="top">
+    <h1 class="title">Possibility finder</h1>
+    <p class="subtitle">Two sides of the same conflict \u2014 yours, and your best guess at theirs.</p>
+  </header>
+  <div class="visual-wrap">${circlesSVG(progressFraction())}</div>
+  `;
+}
+
+function progressTrack(){
+  let dots = '';
+  for (let i=0;i<STEPS.length;i++){
+    let cls = 'progress-dot';
+    if (i < state.step) cls += ' done';
+    if (i === state.step) cls += ' current';
+    dots += `<div class="${cls}"></div>`;
+  }
+  return `<div class="progress-track">${dots}</div>`;
+}
+
+function navRow(opts){
+  const { backDisabled, nextLabel, nextDisabled } = opts;
+  return `
+  <div class="nav-row">
+    <button class="nav ghost" id="backBtn" ${backDisabled ? 'disabled' : ''}>Back</button>
+    <button class="nav primary" id="nextBtn" ${nextDisabled ? 'disabled' : ''}>${nextLabel || 'Next'}</button>
+  </div>`;
+}
+
+function render(){
+  const app = document.getElementById('app');
+  app.innerHTML = '';
+  app.appendChild(el(`<div>${header()}</div>`));
+
+  const step = STEPS[state.step];
+  let cardHTML = '';
+
+  if (step.type === 'intro'){
+    cardHTML = `
+    <div class="card">
+      <h2 class="prompt">What this is</h2>
+      <p class="hint">A guided way to think through a conflict from both sides \u2014 yours, and your best guess at theirs. One question at a time, ending with a few places you could start.</p>
+      <p class="hint">Your answers stay in this browser as you go \u2014 nothing is sent anywhere until you choose to copy or share it.</p>
+      <p class="hint" style="margin-bottom:0"><strong>If there\u2019s more than one conflict or disagreement with this person, pick just one to focus on here.</strong> You can always come back and work through another one separately.</p>
+    </div>`;
+  } else if (step.type === 'setup'){
+    cardHTML = `
+    <div class="card">
+      <p class="eyebrow neutral">Before you start</p>
+      <h2 class="prompt">What\u2019s the situation, and who\u2019s it with?</h2>
+      <p class="hint">A sentence or two is plenty. You\u2019ll fill in the rest as you go.</p>
+      <label class="field-label">Their name (or how you think of them)</label>
+      <input type="text" id="f-name" value="${escapeAttr(state.setup.name)}" placeholder="e.g. my sister, my landlord, Dana">
+      <label class="field-label">What\u2019s the conflict, briefly?</label>
+      <textarea id="f-desc" placeholder="One or two sentences \u2014 just enough to orient yourself.">${escapeHTML(state.setup.description)}</textarea>
+      <label class="field-label">What is a short label for this?</label>
+      <input type="text" id="f-label" value="${escapeAttr(state.setup.label)}" placeholder="e.g. the lease renewal">
+    </div>`;
+  } else if (step.type === 'textarea'){
+    cardHTML = `
+    <div class="card">
+      <p class="eyebrow ${step.person}">${step.eyebrow}</p>
+      <h2 class="prompt">${step.title}</h2>
+      ${step.hint ? `<p class="hint">${step.hint}</p>` : ''}
+      <textarea id="f-main" placeholder="Write whatever comes up.">${escapeHTML(state[step.key])}</textarea>
+    </div>`;
+  } else if (step.type === 'list'){
+    const data = state[step.key];
+    cardHTML = `
+    <div class="card">
+      <p class="eyebrow ${step.person}">${step.eyebrow}</p>
+      <h2 class="prompt">${step.title}</h2>
+      ${step.hint ? `<p class="hint">${step.hint}</p>` : ''}
+      <div id="list-items">
+        ${data.items.map((v,i) => `
+          <div class="list-row" data-idx="${i}">
+            <input type="text" class="list-input" value="${escapeAttr(v)}" placeholder="${i===0 ? 'Start with whatever\u2019s obvious...' : 'And another...'}">
+            ${data.items.length > 1 ? `<button class="remove-btn" data-remove="${i}" aria-label="Remove">\u00d7</button>` : ''}
+          </div>`).join('')}
+      </div>
+      <button class="add-btn" id="addItemBtn">+ what else?</button>
+      ${step.topLabel ? `
+      <div class="top-pick">
+        <label class="field-label" style="margin-top:0">${step.topLabel}</label>
+        <select id="f-top">
+          <option value="">Choose one...</option>
+          ${data.items.filter(v=>v.trim()).map(v => `<option value="${escapeAttr(v)}" ${v===data.top?'selected':''}>${escapeHTML(v)}</option>`).join('')}
+        </select>
+      </div>` : ''}
+    </div>`;
+  } else if (step.type === 'perspective'){
+    cardHTML = `
+    <div class="card">
+      <p class="eyebrow neutral">Switching seats</p>
+      <h2 class="prompt">A couple of questions from their side of the table</h2>
+      <p class="hint">Still your best guess \u2014 but try sitting in their chair for a moment.</p>
+      <label class="field-label">If they were sitting here, what would they say you\u2019re getting wrong?</label>
+      <textarea id="f-persp-a" placeholder="What would they push back on, in your account of this?">${escapeHTML(state.perspective.a)}</textarea>
+      <label class="field-label">If you could be in their mind and heart for 30 seconds, what else might be in there?</label>
+      <textarea id="f-persp-b" placeholder="Anything else that didn\u2019t fit in the earlier answers.">${escapeHTML(state.perspective.b)}</textarea>
+    </div>`;
+  } else if (step.type === 'confidence'){
+    cardHTML = `
+    <div class="card">
+      <p class="eyebrow neutral">Before you go further</p>
+      <h2 class="prompt">How sure are you about all that?</h2>
+      <p class="hint">Everything you guessed about them is a hypothesis, not a fact. Rate how confident you feel on average for your guesses.</p>
+      <div class="confidence-row">
+        <div class="label-line">
+          <span>Your overall confidence</span>
+          <span class="val">${state.confidence}/10</span>
+        </div>
+        <input type="range" min="1" max="10" step="1" value="${state.confidence}" data-conf="overall">
+      </div>
+      <label class="field-label">What is one question you have that would really help you understand where they\u2019re coming from?</label>
+      <textarea id="f-understanding" placeholder="The thing you\u2019d actually want to ask them, if you could.">${escapeHTML(state.understandingQuestion)}</textarea>
+    </div>`;
+  } else if (step.type === 'results'){
+    cardHTML = renderResultsCard();
+  }
+
+  app.appendChild(el(`<div>${cardHTML}</div>`));
+
+  if (step.type !== 'results'){
+    const navHTML = navRow({
+      backDisabled: state.step === 0,
+      nextLabel: step.type === 'intro' ? 'Begin' : (state.step === STEPS.length - 2 ? 'See possibilities' : 'Next'),
+      nextDisabled: false
+    });
+    app.appendChild(el(`<div>${navHTML}${progressTrack()}</div>`));
+  } else {
+    app.appendChild(el(`<div>${progressTrack()}</div>`));
+  }
+
+  attachHandlers(step);
+}
+
+function renderResultsCard(){
+  if (state.resultsError){
+    return `
+    <div class="card">
+      <p class="eyebrow neutral">Now what</p>
+      <h2 class="prompt">Couldn\u2019t generate possibilities</h2>
+      <div class="error-box">${escapeHTML(state.resultsError)}</div>
+      <div class="action-row">
+        <button class="nav primary" id="retryBtn">Try again</button>
+        <button class="nav ghost" id="backFromResults">Back</button>
+      </div>
+    </div>`;
+  }
+
+  if (!state.results){
+    return `
+    <div class="card">
+      <p class="eyebrow neutral">Now what</p>
+      <h2 class="prompt">Some places you could start</h2>
+      <p class="hint">Based on everything you\u2019ve mapped \u2014 yours and your best guesses about theirs \u2014 here are some possible approaches.</p>
+      <div class="action-row">
+        <button class="nav primary" id="generateBtn">Find some possibilities</button>
+        <button class="nav ghost" id="backFromResults">Back</button>
+      </div>
+    </div>`;
+  }
+
+  const r = state.results;
+  const optionsHTML = r.options.map((opt, idx) => {
+    const sy = opt.scores.satisfactionYou || 0;
+    const st = opt.scores.satisfactionThem || 0;
+    const fy = opt.scores.fearReductionYou || 0;
+    const ft = opt.scores.fearReductionThem || 0;
+    const iy = opt.scores.identityYou || 0;
+    const it = opt.scores.identityThem || 0;
+    return `
+    <div class="option-card">
+      <p class="option-title">${idx+1}. ${escapeHTML(opt.title)}</p>
+      <p class="option-desc">${escapeHTML(opt.insight)} For example ... ${escapeHTML(opt.description)}</p>
+      <div class="bar-group">
+        ${barRow('Wants met', sy, st)}
+        ${barRow('Fear eased', fy, ft)}
+        ${barRow('Identity', iy, it)}
+      </div>
+    </div>`;
+  }).join('');
+
+  const groups = [
+    { key: 'strongestWinWin', label: 'Strongest win-win' }
+  ];
+
+  const analysisHTML = groups.map(g => {
+    const idxs = (r.analysis && r.analysis[g.key]) || [];
+    if (!idxs.length) return '';
+    return `
+    <div>
+      <h3>${g.label}</h3>
+      <ul>${idxs.map(i => r.options[i] ? `<li>${escapeHTML(r.options[i].title)}</li>` : '').join('')}</ul>
+    </div>`;
+  }).join('');
+
+  const reflectionHTML = r.reflection ? `
+    <div class="reflection-block">
+      <div class="reflection-grid">
+        <div>
+          <p class="eyebrow you">You</p>
+          <p class="reflection-line"><strong>Want:</strong> ${escapeHTML(r.reflection.you.wants)}</p>
+          <p class="reflection-line"><strong>Afraid of:</strong> ${escapeHTML(r.reflection.you.fears)}</p>
+          <p class="reflection-line"><strong>Trying to be:</strong> ${escapeHTML(r.reflection.you.identity)}</p>
+        </div>
+        <div>
+          <p class="eyebrow them">Them</p>
+          <p class="reflection-line"><strong>Want:</strong> ${escapeHTML(r.reflection.them.wants)}</p>
+          <p class="reflection-line"><strong>Afraid of:</strong> ${escapeHTML(r.reflection.them.fears)}</p>
+          <p class="reflection-line"><strong>Trying to be:</strong> ${escapeHTML(r.reflection.them.identity)}</p>
+        </div>
+      </div>
+      ${r.reflection.insight ? `<p class="hint" style="margin-bottom:0;">${escapeHTML(r.reflection.insight)}</p>` : ''}
+    </div>` : '';
+
+  return `
+  <div class="card">
+    <p class="eyebrow neutral">Now what</p>
+    <h2 class="prompt">Where things stand</h2>
+    ${reflectionHTML}
+    <h2 class="prompt" style="margin-top:1.75rem;">Some places you could start</h2>
+    <p class="hint">The bars on each option show how well it lands for you (terracotta) and your best guess for them (teal) \u2014 for what they\u2019d give each of you, how much it eases each side\u2019s fear, and how well it fits who each of you is trying to be.</p>
+    ${optionsHTML}
+    <div class="analysis-block">
+      ${analysisHTML}
+    </div>
+    <div class="action-row">
+      <button class="nav ghost" id="copyBtn">Copy summary as text</button>
+      <button class="nav ghost" id="startOverBtn">Start over</button>
+    </div>
+    <div id="copyFallback"></div>
+  </div>`;
+}
+
+function barRow(label, youVal, themVal){
+  return `
+  <div class="bar-row">
+    <span>${label}</span>
+    <div style="display:flex; flex-direction:column; gap:3px;">
+      <div class="bar-track"><div class="bar-fill you" style="width:${Math.max(0,Math.min(100,youVal*10))}%"></div></div>
+      <div class="bar-track"><div class="bar-fill them" style="width:${Math.max(0,Math.min(100,themVal*10))}%"></div></div>
+    </div>
+  </div>`;
+}
+
+function escapeHTML(str){
+  return (str || '').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+}
+function escapeAttr(str){
+  return (str || '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+}
+
+function saveCurrentStepInputs(){
+  const step = STEPS[state.step];
+  if (step.type === 'setup'){
+    state.setup.name = document.getElementById('f-name').value;
+    state.setup.label = document.getElementById('f-label').value;
+    state.setup.description = document.getElementById('f-desc').value;
+  } else if (step.type === 'textarea'){
+    state[step.key] = document.getElementById('f-main').value;
+  } else if (step.type === 'list'){
+    const inputs = document.querySelectorAll('.list-input');
+    state[step.key].items = Array.from(inputs).map(i => i.value);
+    const topEl = document.getElementById('f-top');
+    if (topEl) state[step.key].top = topEl.value;
+  } else if (step.type === 'perspective'){
+    state.perspective.a = document.getElementById('f-persp-a').value;
+    state.perspective.b = document.getElementById('f-persp-b').value;
+  } else if (step.type === 'confidence'){
+    state.confidence = parseInt(document.querySelector('[data-conf="overall"]').value, 10);
+    state.understandingQuestion = document.getElementById('f-understanding').value;
+  }
+}
+
+function attachHandlers(step){
+  const backBtn = document.getElementById('backBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  if (backBtn) backBtn.addEventListener('click', () => {
+    saveCurrentStepInputs();
+    state.step = Math.max(0, state.step - 1);
+    saveSession();
+    render();
+  });
+
+  if (nextBtn) nextBtn.addEventListener('click', () => {
+    saveCurrentStepInputs();
+    state.step = Math.min(STEPS.length - 1, state.step + 1);
+    saveSession();
+    render();
+  });
+
+  if (step.type === 'list'){
+    document.getElementById('addItemBtn').addEventListener('click', () => {
+      saveCurrentStepInputs();
+      state[step.key].items.push('');
+      saveSession();
+      render();
+    });
+    document.querySelectorAll('[data-remove]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        saveCurrentStepInputs();
+        const idx = parseInt(btn.getAttribute('data-remove'), 10);
+        state[step.key].items.splice(idx, 1);
+        if (state[step.key].items.length === 0) state[step.key].items = [''];
+        saveSession();
+        render();
+      });
+    });
+    if (step.topLabel){
+      const topSelect = document.getElementById('f-top');
+      const refreshTopOptions = () => {
+        const current = topSelect.value;
+        const items = Array.from(document.querySelectorAll('.list-input')).map(i => i.value);
+        const nonEmpty = items.filter(v => v.trim());
+        topSelect.innerHTML = '<option value="">Choose one...</option>' +
+          nonEmpty.map(v => `<option value="${escapeAttr(v)}" ${v === current ? 'selected' : ''}>${escapeHTML(v)}</option>`).join('');
+        if (!nonEmpty.includes(current)) topSelect.value = '';
+      };
+      document.querySelectorAll('.list-input').forEach(input => {
+        input.addEventListener('input', refreshTopOptions);
+      });
+    }
+  }
+
+  if (step.type === 'confidence'){
+    document.querySelectorAll('[data-conf]').forEach(input => {
+      input.addEventListener('input', () => {
+        state.confidence = parseInt(input.value, 10);
+        const valSpan = input.closest('.confidence-row').querySelector('.val');
+        valSpan.textContent = state.confidence + '/10';
+      });
+      input.addEventListener('change', saveSession);
+    });
+  }
+
+  if (step.type === 'results'){
+    const genBtn = document.getElementById('generateBtn');
+    const retryBtn = document.getElementById('retryBtn');
+    const backFromResults = document.getElementById('backFromResults');
+    const copyBtn = document.getElementById('copyBtn');
+    const startOverBtn = document.getElementById('startOverBtn');
+
+    if (genBtn) genBtn.addEventListener('click', generatePossibilities);
+    if (retryBtn) retryBtn.addEventListener('click', generatePossibilities);
+    if (backFromResults) backFromResults.addEventListener('click', () => {
+      state.step = STEPS.length - 2;
+      render();
+    });
+    if (copyBtn) copyBtn.addEventListener('click', copySummary);
+    if (startOverBtn) startOverBtn.addEventListener('click', () => {
+      if (startOverBtn.dataset.confirm === 'true'){
+        startOver();
+      } else {
+        startOverBtn.dataset.confirm = 'true';
+        startOverBtn.textContent = 'Click again to clear everything';
+        clearTimeout(startOverBtn._resetTimer);
+        startOverBtn._resetTimer = setTimeout(() => {
+          startOverBtn.dataset.confirm = 'false';
+          startOverBtn.textContent = 'Start over';
+        }, 3000);
+      }
+    });
+  }
+}
+
+function startOver(){
+  state = {
+    step: 0,
+    setup: { name: '', label: '', description: '' },
+    gratitude: { items: ['', '', ''] },
+    yourOutcome: '', theirOutcome: '', theirGenerous: '',
+    yourProvides: { items: ['', '', ''], top: '' },
+    theirProvides: { items: ['', '', ''], top: '' },
+    yourFears: { items: ['', '', ''], top: '' },
+    theirFears: { items: ['', '', ''], top: '' },
+    yourIdentity: { items: ['', '', ''], top: '' },
+    theirIdentity: { items: ['', '', ''], top: '' },
+    perspective: { a: '', b: '' },
+    confidence: 5,
+    understandingQuestion: '',
+    results: null, resultsError: null
+  };
+  saveSession();
+  render();
+}
+
+function buildPrompt(){
+  const s = state;
+  const itemsList = (arr) => arr.filter(v => v.trim()).map(v => '- ' + v).join('\n') || '(none given)';
+  return `
+SITUATION
+With: ${s.setup.name || '(unnamed)'}
+Label: ${s.setup.label || '(none)'}
+Description: ${s.setup.description || '(none)'}
+
+WHAT I APPRECIATE ABOUT THEM
+${itemsList(s.gratitude.items)}
+
+YOUR SIDE
+If it went your way: ${s.yourOutcome || '(none)'}
+What that would give you:
+${itemsList(s.yourProvides.items)}
+Most important to you: ${s.yourProvides.top || '(none)'}
+What you're afraid happens otherwise:
+${itemsList(s.yourFears.items)}
+Most important fear to avoid: ${s.yourFears.top || '(none)'}
+Who you're trying to be in this story:
+${itemsList(s.yourIdentity.items)}
+Most important identity: ${s.yourIdentity.top || '(none)'}
+
+THEIR SIDE (all hypotheses, not facts)
+If it went their way: ${s.theirOutcome || '(none)'}
+Most generous read of what they're trying to do: ${s.theirGenerous || '(none)'}
+What that would give them:
+${itemsList(s.theirProvides.items)}
+Most important to them: ${s.theirProvides.top || '(none)'}
+What they might be afraid of:
+${itemsList(s.theirFears.items)}
+Most important fear for them to avoid: ${s.theirFears.top || '(none)'}
+Who they might be trying to be:
+${itemsList(s.theirIdentity.items)}
+Most important identity for them: ${s.theirIdentity.top || '(none)'}
+
+PERSPECTIVE SHIFT
+What they might say I'm getting wrong: ${s.perspective.a || '(none)'}
+What else might be true from their side: ${s.perspective.b || '(none)'}
+
+CONFIDENCE
+Overall confidence in the guesses about them (1-10): ${s.confidence}/10
+A question that would help understand where they're coming from: ${s.understandingQuestion || '(none)'}
+`;
+}
+
+async function generatePossibilities(){
+  state.resultsError = null;
+  const app = document.getElementById('app');
+  const card = app.querySelector('.card');
+  card.innerHTML = `
+    <p class="eyebrow neutral">Now what</p>
+    <h2 class="prompt">Some places you could start</h2>
+    <div class="loading"><div class="spinner"></div> Looking at all this \u2014 may take a moment...</div>
+  `;
+
+  if (!BACKEND_URL){
+    state.resultsError = 'No backend is configured yet \u2014 set BACKEND_URL near the top of the script to your deployed Vercel endpoint.';
+    render();
+    return;
+  }
+
+  try{
+    const response = await fetch(BACKEND_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: buildPrompt() })
+    });
+
+    const parsed = await response.json();
+
+    if (!response.ok){
+      throw new Error(parsed.error || ('The request didn\u2019t go through (status ' + response.status + ').'));
+    }
+
+    if (!parsed.options || !Array.isArray(parsed.options) || parsed.options.length === 0){
+      throw new Error('Didn\u2019t get usable options back. Try again?');
+    }
+
+    state.results = parsed;
+    saveSession();
+    render();
+  }catch(err){
+    state.resultsError = err.message || 'Something went wrong.';
+    render();
+  }
+}
+
+function copySummary(){
+  let text = buildPrompt();
+  if (state.results){
+    const ref = state.results.reflection;
+    if (ref){
+      text += '\nWHERE THINGS STAND\n';
+      text += `You \u2014 want: ${ref.you.wants} | afraid of: ${ref.you.fears} | trying to be: ${ref.you.identity}\n`;
+      text += `Them \u2014 want: ${ref.them.wants} | afraid of: ${ref.them.fears} | trying to be: ${ref.them.identity}\n`;
+      if (ref.insight) text += `${ref.insight}\n`;
+    }
+    text += '\nPOSSIBLE APPROACHES\n';
+    state.results.options.forEach((opt, idx) => {
+      text += `${idx+1}. ${opt.title}\n`;
+      text += `   ${opt.insight || ''} For example ... ${opt.description}\n`;
+    });
+  }
+
+  const showFallback = () => {
+    const holder = document.getElementById('copyFallback');
+    holder.innerHTML = `
+      <p class="small-note">Couldn\u2019t copy automatically \u2014 the text is selected below, so you can copy it manually (Ctrl/Cmd+C).</p>
+      <textarea readonly style="min-height:8rem;">${escapeHTML(text)}</textarea>`;
+    const ta = holder.querySelector('textarea');
+    ta.focus();
+    ta.select();
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copyBtn');
+      const original = btn.textContent;
+      btn.textContent = 'Copied';
+      document.getElementById('copyFallback').innerHTML = '';
+      setTimeout(() => { btn.textContent = original; }, 1500);
+    }).catch(showFallback);
+  } else {
+    showFallback();
+  }
+}
+
+loadSession();
+</script>
+</body>
+</html>
