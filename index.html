@@ -80,7 +80,7 @@
     font-family: 'Fraunces', serif;
     font-style: italic;
     font-size: 13px;
-    fill: #FFFFFF;
+    fill: #000000;
   }
 
   .step-counter{
@@ -430,7 +430,7 @@ const STEPS = [
   {
     type: 'textarea', key: 'yourOutcome', person: 'you',
     eyebrow: 'Your outcome',
-    title: 'If this went exactly your way, what would that look like?',
+    title: 'If everything about this situation went exactly your way, what would that look like.',
     hint: 'Not the diplomatic version. The one you\u2019d actually want. Be as detailed as you can.'
   },
   {
@@ -536,7 +536,7 @@ function circlesSVG(progress){
     <circle cx="${cx2}" cy="70" r="${r}" fill="${getVar('--them')}" opacity="0.45"/>
     <text x="${cx1 - r + 10}" y="142" class="circle-label" fill="${getVar('--you')}">You</text>
     <text x="${cx2 + r - 38}" y="142" class="circle-label" fill="${getVar('--them')}">Them</text>
-    ${overlapVisible ? `<text x="150" y="74" text-anchor="middle" class="overlap-label">possibility</text>` : ''}
+    ${overlapVisible ? `<text x="150" y="74" text-anchor="middle" class="overlap-label">POSSIBILITY</text>` : ''}
   </svg>`;
 }
 
@@ -632,7 +632,7 @@ function render(){
       <h2 class="prompt">What this is</h2>
       <p class="hint">A guided way to think through a conflict from both sides \u2014 yours, and your best guess at theirs. One question at a time, ending with a few places you could start.</p>
       <p class="hint">Your answers stay in this browser as you go \u2014 nothing is sent anywhere until you choose to copy or share it.</p>
-      <p class="hint" style="margin-bottom:0"><strong>If there\u2019s more than one conflict or disagreement with this person, pick just one to focus on here.</strong> You can always come back and work through another one separately.</p>
+      <p class="hint" style="margin-bottom:0"><strong>If there\u2019s more than one conflict or disagreement with this person, pick JUST ONE to focus on here.</strong> You can always come back and work through another one separately.</p>
     </div>`;
   } else if (step.type === 'setup'){
     cardHTML = `
@@ -640,7 +640,7 @@ function render(){
       <p class="eyebrow neutral">Before you start</p>
       <h2 class="prompt">What\u2019s the situation, and who\u2019s it with?</h2>
       <p class="hint">A sentence or two is plenty. You\u2019ll fill in the rest as you go.</p>
-      <label class="field-label">Their name (or how you think of them)</label>
+      <label class="field-label">Who is the conflict with? (Their name or how you think of them)</label>
       <input type="text" id="f-name" value="${escapeAttr(state.setup.name)}" placeholder="e.g. my sister, my landlord, Dana">
       <label class="field-label">What\u2019s the conflict, briefly?</label>
       <textarea id="f-desc" placeholder="One or two sentences \u2014 just enough to orient yourself.">${escapeHTML(state.setup.description)}</textarea>
@@ -648,10 +648,13 @@ function render(){
       <input type="text" id="f-label" value="${escapeAttr(state.setup.label)}" placeholder="e.g. the lease renewal">
     </div>`;
   } else if (step.type === 'textarea'){
+    const stepTitle = step.key === 'yourOutcome'
+      ? `If everything about this situation (${escapeHTML(state.setup.label)}) went exactly your way, what would that look like.`
+      : step.title;
     cardHTML = `
     <div class="card">
       <p class="eyebrow ${step.person}">${step.eyebrow}</p>
-      <h2 class="prompt">${step.title}</h2>
+      <h2 class="prompt">${stepTitle}</h2>
       ${step.hint ? `<p class="hint">${step.hint}</p>` : ''}
       <textarea id="f-main" placeholder="Write whatever comes up.">${escapeHTML(state[step.key])}</textarea>
     </div>`;
@@ -1131,4 +1134,3 @@ loadSession();
 </script>
 </body>
 </html>
-
