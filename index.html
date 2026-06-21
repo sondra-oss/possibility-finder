@@ -404,7 +404,6 @@ let state = {
   gratitude: { items: ['', '', ''] },
   yourOutcome: '',
   theirOutcome: '',
-  theirGenerous: '',
   yourProvides: { items: ['', '', ''], top: '' },
   theirProvides: { items: ['', '', ''], top: '' },
   yourFears: { items: ['', '', ''], top: '' },
@@ -430,62 +429,50 @@ const STEPS = [
   {
     type: 'textarea', key: 'yourOutcome', person: 'you',
     eyebrow: 'Your outcome',
-    title: 'If everything about this situation went exactly your way, what would that look like.',
+    title: 'If everything about this conflict went exactly your way, what would that look like.',
     hint: 'Not the diplomatic version. The one you\u2019d actually want. Be as detailed as you can.'
   },
   {
     type: 'textarea', key: 'theirOutcome', person: 'them',
     eyebrow: 'Their outcome',
-    title: 'Now imagine it went exactly their way. What would that look like?',
+    title: 'Now imagine the conflict resolved exactly the way they wanted. What would that look like?',
     hint: 'This is a guess. You won\u2019t get it exactly right, and that\u2019s fine. Be as detailed as you can.'
-  },
-  {
-    type: 'textarea', key: 'theirGenerous', person: 'them',
-    eyebrow: 'A more generous read',
-    title: 'What\u2019s the most generous interpretation of what they\u2019re trying to do here?',
-    hint: 'People rarely think of themselves as the villain. If they were the hero of this story, how would they explain it?'
   },
   {
     type: 'list', key: 'yourProvides', person: 'you',
     eyebrow: 'What it gives you',
-    title: 'If you got everything you wanted, what would that actually give you?',
-    hint: 'Keep going past the initial answers to find the less obvious ones.',
-    topLabel: 'Of everything you listed, which matters most?'
+    title: 'If the conflict resolved exactly the way you wanted, what would that actually provide for you?',
+    hint: 'Keep going past the initial answers to find the less obvious ones.'
   },
   {
     type: 'list', key: 'theirProvides', person: 'them',
     eyebrow: 'What it gives them',
-    title: 'If they got everything they wanted, what would that give them \u2014 from their most generous perspective?',
-    hint: 'Same question, their side. Guess freely but be sure it reflects what THEY would say.',
-    topLabel: 'Which of these do you think matters most to them?'
+    title: 'If the conflict resolved exactly the way they wanted, what would that actually provide for them?',
+    hint: 'Same question, their side. Guess freely but be sure it reflects what THEY would say.'
   },
   {
     type: 'list', key: 'yourFears', person: 'you',
     eyebrow: 'What you\u2019re guarding against',
-    title: 'What are you afraid would happen if you didn\u2019t get what you want?',
-    hint: 'List as many as you can think of. Some will be bigger than others.',
-    topLabel: 'Which of these is most important for you to avoid?'
+    title: 'What are you afraid would happen if you didn\u2019t get what you want in this conflict?',
+    hint: 'List as many as you can think of. Some will be bigger than others.'
   },
   {
     type: 'list', key: 'theirFears', person: 'them',
     eyebrow: 'What they might be guarding against',
-    title: 'What do you think are all the things they\u2019re afraid would happen if they didn\u2019t get what they want?',
-    hint: 'Still a guess. Notice if this is harder to do than the last one.',
-    topLabel: 'Which of these do you think matters most to them?'
+    title: 'What do you think are the biggest fears they have in this conflict?',
+    hint: 'Still a guess. Notice if this is harder to do than the last one.'
   },
   {
     type: 'list', key: 'yourIdentity', person: 'you',
     eyebrow: 'Who you\u2019re trying to be',
-    title: 'In the story you\u2019re telling yourself about this, who are you trying to be?',
-    hint: 'A fair person. A good parent. Someone who doesn\u2019t get pushed around. The peacemaker. Whatever comes up.',
-    topLabel: 'Which version of yourself feels most important here?'
+    title: 'Who are you trying to be in this situation?',
+    hint: 'A fair person. A good parent. Someone who doesn\u2019t get pushed around. The peacemaker. Whatever comes up.'
   },
   {
     type: 'list', key: 'theirIdentity', person: 'them',
     eyebrow: 'Who they might be trying to be',
     title: 'If they\u2019re the hero of their own story, who are they trying to be?',
-    hint: 'A reasonable person. Someone who can\u2019t be taken advantage of. A good provider. Take a guess.',
-    topLabel: 'Which version of themselves do you think matters most to them?'
+    hint: 'A reasonable person. Someone who can\u2019t be taken advantage of. A good provider. Take a guess.'
   },
   { type: 'perspective' },
   { type: 'confidence' },
@@ -629,8 +616,9 @@ function render(){
   if (step.type === 'intro'){
     cardHTML = `
     <div class="card">
-      <h2 class="prompt">What this is</h2>
+      <h2 class="prompt">What is this?</h2>
       <p class="hint">A guided way to think through a conflict from both sides \u2014 yours, and your best guess at theirs. One question at a time, ending with a few places you could start.</p>
+      <p class="hint">There are about 20 short questions you will answer.</p>
       <p class="hint">Your answers stay in this browser as you go \u2014 nothing is sent anywhere until you choose to copy or share it.</p>
       <p class="hint" style="margin-bottom:0"><strong>If there\u2019s more than one conflict or disagreement with this person, pick JUST ONE to focus on here.</strong> You can always come back and work through another one separately.</p>
     </div>`;
@@ -648,9 +636,12 @@ function render(){
       <input type="text" id="f-label" value="${escapeAttr(state.setup.label)}" placeholder="e.g. the lease renewal">
     </div>`;
   } else if (step.type === 'textarea'){
-    const stepTitle = step.key === 'yourOutcome'
-      ? `If everything about this situation (${escapeHTML(state.setup.label)}) went exactly your way, what would that look like.`
-      : step.title;
+    let stepTitle = step.title;
+    if (step.key === 'yourOutcome'){
+      stepTitle = `If everything about this conflict between you and ${formattedPersonReference(state.setup.name)} (${escapeHTML(state.setup.label)}) went exactly your way, what would that look like.`;
+    } else if (step.key === 'theirOutcome'){
+      stepTitle = `Now imagine the conflict resolved exactly the way ${formattedPersonReference(state.setup.name)} wanted. What would that look like?`;
+    }
     cardHTML = `
     <div class="card">
       <p class="eyebrow ${step.person}">${step.eyebrow}</p>
@@ -660,10 +651,22 @@ function render(){
     </div>`;
   } else if (step.type === 'list'){
     const data = state[step.key];
+    let stepTitle = step.title;
+    if (step.key === 'gratitude'){
+      stepTitle = `What do you appreciate about ${formattedPersonReference(state.setup.name)}?`;
+    } else if (step.key === 'yourProvides'){
+      stepTitle = `If the conflict with ${formattedPersonReference(state.setup.name)} resolved exactly the way you wanted, what would that actually provide for you?`;
+    } else if (step.key === 'theirProvides'){
+      stepTitle = `If the conflict resolved exactly the way ${formattedPersonReference(state.setup.name)} wanted, what would that actually provide for them?`;
+    } else if (step.key === 'theirFears'){
+      stepTitle = `What do you think are the biggest fears ${formattedPersonReference(state.setup.name)} has in this conflict?`;
+    } else if (step.key === 'theirIdentity'){
+      stepTitle = `If they\u2019re the hero of their own story, who is ${formattedPersonReference(state.setup.name)} trying to be?`;
+    }
     cardHTML = `
     <div class="card">
       <p class="eyebrow ${step.person}">${step.eyebrow}</p>
-      <h2 class="prompt">${step.title}</h2>
+      <h2 class="prompt">${stepTitle}</h2>
       ${step.hint ? `<p class="hint">${step.hint}</p>` : ''}
       <div id="list-items">
         ${data.items.map((v,i) => `
@@ -688,7 +691,7 @@ function render(){
       <p class="eyebrow neutral">Switching seats</p>
       <h2 class="prompt">A couple of questions from their side of the table</h2>
       <p class="hint">Still your best guess \u2014 but try sitting in their chair for a moment.</p>
-      <label class="field-label">If they were sitting here, what would they say you\u2019re getting wrong?</label>
+      <label class="field-label">If ${formattedPersonReference(state.setup.name)} were sitting here, what would they say you\u2019re getting wrong?</label>
       <textarea id="f-persp-a" placeholder="What would they push back on, in your account of this?">${escapeHTML(state.perspective.a)}</textarea>
       <label class="field-label">If you could be in their mind and heart for 30 seconds, what else might be in there?</label>
       <textarea id="f-persp-b" placeholder="Anything else that didn\u2019t fit in the earlier answers.">${escapeHTML(state.perspective.b)}</textarea>
@@ -727,6 +730,10 @@ function render(){
   }
 
   attachHandlers(step);
+
+  if (step.type === 'results' && !state.results && !state.resultsError){
+    setTimeout(generatePossibilities, 0);
+  }
 }
 
 function renderResultsCard(){
@@ -747,12 +754,8 @@ function renderResultsCard(){
     return `
     <div class="card">
       <p class="eyebrow neutral">Now what</p>
-      <h2 class="prompt">Some places you could start</h2>
-      <p class="hint">Based on everything you\u2019ve mapped \u2014 yours and your best guesses about theirs \u2014 here are some possible approaches.</p>
-      <div class="action-row">
-        <button class="nav primary" id="generateBtn">Find some possibilities</button>
-        <button class="nav ghost" id="backFromResults">Back</button>
-      </div>
+      <h2 class="prompt">Finding possibilities</h2>
+      <div class="loading"><div class="spinner"></div> Looking at all this \u2014 may take a moment...</div>
     </div>`;
   }
 
@@ -841,6 +844,12 @@ function barRow(label, youVal, themVal){
 
 function escapeHTML(str){
   return (str || '').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+}
+function secondPersonReference(str){
+  return (str || '').trim().replace(/^my\b/i, 'your');
+}
+function formattedPersonReference(str){
+  return `<em>${escapeHTML(secondPersonReference(str))}</em>`;
 }
 function escapeAttr(str){
   return (str || '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -951,13 +960,11 @@ function attachHandlers(step){
   }
 
   if (step.type === 'results'){
-    const genBtn = document.getElementById('generateBtn');
     const retryBtn = document.getElementById('retryBtn');
     const backFromResults = document.getElementById('backFromResults');
     const copyBtn = document.getElementById('copyBtn');
     const startOverBtn = document.getElementById('startOverBtn');
 
-    if (genBtn) genBtn.addEventListener('click', generatePossibilities);
     if (retryBtn) retryBtn.addEventListener('click', generatePossibilities);
     if (backFromResults) backFromResults.addEventListener('click', () => {
       state.step = STEPS.length - 2;
@@ -985,7 +992,7 @@ function startOver(){
     step: 0,
     setup: { name: '', label: '', description: '' },
     gratitude: { items: ['', '', ''] },
-    yourOutcome: '', theirOutcome: '', theirGenerous: '',
+    yourOutcome: '', theirOutcome: '',
     yourProvides: { items: ['', '', ''], top: '' },
     theirProvides: { items: ['', '', ''], top: '' },
     yourFears: { items: ['', '', ''], top: '' },
@@ -1017,26 +1024,19 @@ YOUR SIDE
 If it went your way: ${s.yourOutcome || '(none)'}
 What that would give you:
 ${itemsList(s.yourProvides.items)}
-Most important to you: ${s.yourProvides.top || '(none)'}
 What you're afraid happens otherwise:
 ${itemsList(s.yourFears.items)}
-Most important fear to avoid: ${s.yourFears.top || '(none)'}
 Who you're trying to be in this story:
 ${itemsList(s.yourIdentity.items)}
-Most important identity: ${s.yourIdentity.top || '(none)'}
 
 THEIR SIDE (all hypotheses, not facts)
 If it went their way: ${s.theirOutcome || '(none)'}
-Most generous read of what they're trying to do: ${s.theirGenerous || '(none)'}
 What that would give them:
 ${itemsList(s.theirProvides.items)}
-Most important to them: ${s.theirProvides.top || '(none)'}
 What they might be afraid of:
 ${itemsList(s.theirFears.items)}
-Most important fear for them to avoid: ${s.theirFears.top || '(none)'}
 Who they might be trying to be:
 ${itemsList(s.theirIdentity.items)}
-Most important identity for them: ${s.theirIdentity.top || '(none)'}
 
 PERSPECTIVE SHIFT
 What they might say I'm getting wrong: ${s.perspective.a || '(none)'}
@@ -1054,7 +1054,7 @@ async function generatePossibilities(){
   const card = app.querySelector('.card');
   card.innerHTML = `
     <p class="eyebrow neutral">Now what</p>
-    <h2 class="prompt">Some places you could start</h2>
+    <h2 class="prompt">Finding possibilities</h2>
     <div class="loading"><div class="spinner"></div> Looking at all this \u2014 may take a moment...</div>
   `;
 
