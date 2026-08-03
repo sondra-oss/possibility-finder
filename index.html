@@ -80,7 +80,7 @@
     font-family: 'Fraunces', serif;
     font-style: italic;
     font-size: 13px;
-    fill: #FFFFFF;
+    fill: #000000;
   }
 
   .step-counter{
@@ -540,8 +540,8 @@ function circlesSVG(progress){
     <circle cx="${cx1}" cy="70" r="${r}" fill="${getVar('--you')}" opacity="0.45"/>
     <circle cx="${cx2}" cy="70" r="${r}" fill="${getVar('--them')}" opacity="0.45"/>
     <text x="${cx1 - r + 10}" y="142" class="circle-label" fill="${getVar('--you')}">You</text>
-    <text x="${cx2 + r - 38}" y="142" class="circle-label" fill="${getVar('--them')}">${theirName()}</text>
-    ${overlapVisible ? `<text x="150" y="74" text-anchor="middle" class="overlap-label">possibility</text>` : ''}
+    <text x="${cx2}" y="142" text-anchor="middle" class="circle-label" fill="${getVar('--them')}">${theirName()}</text>
+    ${overlapVisible ? `<text x="150" y="74" text-anchor="middle" class="overlap-label">POSSIBILITY</text>` : ''}
   </svg>`;
 }
 
